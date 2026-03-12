@@ -1,0 +1,8 @@
+node_modules/
+/.pnp*
+pnpm-lock.yaml
+.DS_Store
+.env
+dist/
+.idea/
+*.log

@@ -1,0 +1,13 @@
+{
+  "name": "malvec-coming-soon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Malvec coming soon landing page",
+  "scripts": {
+    "dev": "http-server -p 8000 -c-1",
+    "start": "http-server -p 8000 -c-1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
