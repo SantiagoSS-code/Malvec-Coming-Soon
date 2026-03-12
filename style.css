@@ -1,0 +1,299 @@
+/* ─── HERO FLUID CANVAS ────────────────────────────────── */
+#hero-fluid-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+/* ─── RESET & BASE ─────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #09010f;
+  --text:        #ffffff;
+  --muted:       rgba(255, 255, 255, 0.48);
+  --border:      rgba(255, 255, 255, 0.10);
+  --pink:        #e91e8c;
+  --pink-dim:    #c2185b;
+  --purple:      #7b1fa2;
+  --orb-hot:     rgba(214, 51, 132, 0.58);
+  --orb-mid:     rgba(123, 31, 162, 0.32);
+  --orb-edge:    rgba(60, 10, 100, 0.10);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAVBAR ───────────────────────────────────────────── */
+
+#navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 16px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 40px;
+  border: 1px solid rgba(239, 238, 230, 0.08);
+  border-radius: 24px;
+  background: rgba(24, 0, 36, 0.32);
+  box-shadow: 0 2px 32px 0 rgba(0, 0, 0, 0.12);
+  transition: padding 0.3s cubic-bezier(.4, 0, .2, 1);
+}
+
+#navbar.scrolled {
+  padding: 10px 40px;
+}
+
+.nav-logo {
+  font-family: 'Degular Display', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 0.2em;
+  color: #EFEED6;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: rgba(239, 238, 230, 0.6);
+  font-family: 'Degular', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #EFEED6;
+}
+
+.nav-cta {
+  padding: 0.7em 2em;
+  border-radius: 2em;
+  background: linear-gradient(90deg, #7F2EFF 0%, #FF2E7E 100%);
+  color: #fff;
+  font-family: 'Degular Display', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  box-shadow: 0 4px 32px 0 rgba(159, 0, 74, 0.18);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.nav-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 60px rgba(159, 0, 74, 0.5);
+}
+
+/* ─── AMBIENT TOP GLOW ─────────────────────────────────── */
+
+.ambient-top {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 500px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(180, 30, 140, 0.18) 0%,
+    rgba(100, 20, 160, 0.10) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ─── MAIN LAYOUT ──────────────────────────────────────── */
+
+main {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ─── ORB ──────────────────────────────────────────────── */
+
+.orb-wrap {
+  position: absolute;
+  bottom: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 860px;
+  height: 860px;
+  pointer-events: none;
+}
+
+.orb {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      rgba(233, 30, 140, 0.70)  0%,
+      rgba(180, 30, 160, 0.45) 22%,
+      rgba(123, 31, 162, 0.25) 42%,
+      rgba(60,  10, 100, 0.08) 62%,
+      transparent              74%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  animation: orbPulse 8s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+  0%, 100% { opacity: 1;    transform: scale(1);    }
+  50%       { opacity: 0.80; transform: scale(1.05); }
+}
+
+/* ─── CONTENT ──────────────────────────────────────────── */
+
+.content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Badge pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  animation: fadeUp 0.9s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Heading */
+h1 {
+  font-size: clamp(3.5rem, 7vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.0;
+  color: var(--text);
+  animation: fadeUp 0.9s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.gradient-text {
+  background: linear-gradient(120deg, var(--pink) 0%, #ff6b9d 50%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Tagline */
+.tagline {
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  animation: fadeUp 0.9s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* LinkedIn pill button */
+.linkedin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  transition: border-color 0.25s ease,
+              background   0.25s ease,
+              transform    0.25s ease,
+              color        0.25s ease;
+  animation: fadeUp 0.9s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.linkedin-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.linkedin-btn:hover {
+  border-color: var(--pink);
+  background: rgba(233, 30, 140, 0.10);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.linkedin-btn:hover svg {
+  transform: scale(1.15);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  #navbar {
+    padding: 0.9rem 1.25rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .orb-wrap {
+    width: 500px;
+    height: 500px;
+    bottom: -120px;
+  }
+
+  h1 {
+    font-size: 2.75rem;
+  }
+}
