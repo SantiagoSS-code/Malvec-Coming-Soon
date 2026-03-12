@@ -1,21 +1,47 @@
-// Malvec Header
+// Malvec Header — cross-browser resilient
 
-document.addEventListener('DOMContentLoaded', () => {
-  const navbar = document.getElementById('navbar');
-  if (!navbar) return;
+(function () {
+  'use strict';
 
-  // Add/remove .scrolled class for frosted-glass effect on scroll
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 20);
-  }, { passive: true });
+  // Use DOMContentLoaded with a fallback for in-app browsers that may fire late
+  var ready = function (fn) {
+    if (document.readyState !== 'loading') {
+      fn();
+    } else {
+      document.addEventListener('DOMContentLoaded', fn, false);
+    }
+  };
 
-  // Active link tracking
-  navbar.querySelectorAll('.nav-links a').forEach(a => {
-    a.addEventListener('click', (e) => {
-      navbar.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-      a.classList.add('active');
-    });
+  ready(function () {
+    var navbar = document.getElementById('navbar');
+    if (!navbar) return;
+
+    // ── Scroll class toggle (passive for perf) ────────────────
+    var ticking = false;
+    var onScroll = function () {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(function () {
+          navbar.classList.toggle('scrolled', window.scrollY > 20);
+          ticking = false;
+        });
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Set initial state
+    onScroll();
+
+    // ── Active link tracking ──────────────────────────────────
+    var links = navbar.querySelectorAll('.nav-links a');
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function () {
+        for (var j = 0; j < links.length; j++) {
+          links[j].classList.remove('active');
+        }
+        this.classList.add('active');
+      }, false);
+    }
   });
-});
+})();
 
 

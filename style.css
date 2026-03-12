@@ -1,13 +1,3 @@
-/* ─── HERO FLUID CANVAS ────────────────────────────────── */
-#hero-fluid-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  display: block;
-  pointer-events: none;
-}
 /* ─── RESET & BASE ─────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -28,17 +18,110 @@
   --orb-edge:    rgba(60, 10, 100, 0.10);
 }
 
-html, body {
+html {
   height: 100%;
+  /* Prevent horizontal overflow on all browsers */
   overflow-x: hidden;
+  /* Prevent iOS elastic overscroll / pull-to-refresh dragging */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
+  height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent iOS text size adjustments */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ─── HERO FLUID CANVAS ────────────────────────────────── */
+#hero-fluid-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Use 100svh where supported (mobile address bar resilient) */
+  height: 100svh;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  /* Isolate on own GPU-composited layer */
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Prevent canvas from causing horizontal scroll */
+  max-width: 100vw;
+}
+
+/* ─── CSS FALLBACK (shown only when WebGL unavailable) ── */
+.css-fallback {
+  display: none;           /* hidden by default; JS shows it if needed */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  overflow: hidden;
+}
+
+.css-fallback.active {
+  display: block;
+}
+
+/* Animated nebula blobs (CSS-only fallback for WebGL) */
+.css-fallback::before,
+.css-fallback::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.css-fallback::before {
+  top: 20%;
+  left: 30%;
+  width: 50vw;
+  height: 50vw;
+  max-width: 500px;
+  max-height: 500px;
+  background: radial-gradient(circle, rgba(233, 30, 140, 0.25) 0%, transparent 70%);
+  animation: nebulaDrift1 12s ease-in-out infinite alternate;
+}
+
+.css-fallback::after {
+  bottom: 10%;
+  right: 20%;
+  width: 45vw;
+  height: 45vw;
+  max-width: 450px;
+  max-height: 450px;
+  background: radial-gradient(circle, rgba(123, 31, 162, 0.22) 0%, transparent 70%);
+  animation: nebulaDrift2 14s ease-in-out infinite alternate;
+}
+
+@keyframes nebulaDrift1 {
+  0%   { transform: translate3d(0, 0, 0) scale(1);     opacity: 0.7; }
+  100% { transform: translate3d(5vw, -3vh, 0) scale(1.15); opacity: 1;   }
+}
+
+@keyframes nebulaDrift2 {
+  0%   { transform: translate3d(0, 0, 0) scale(1);      opacity: 0.6; }
+  100% { transform: translate3d(-4vw, 2vh, 0) scale(1.1); opacity: 0.9; }
 }
 
 /* ─── NAVBAR ───────────────────────────────────────────── */
@@ -57,7 +140,13 @@ body {
   border: 1px solid rgba(239, 238, 230, 0.08);
   border-radius: 24px;
   background: rgba(24, 0, 36, 0.32);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   box-shadow: 0 2px 32px 0 rgba(0, 0, 0, 0.12);
+  /* GPU layer isolation for smooth scroll transitions */
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   transition: padding 0.3s cubic-bezier(.4, 0, .2, 1);
 }
 
@@ -106,6 +195,8 @@ body {
   text-decoration: none;
   box-shadow: 0 4px 32px 0 rgba(159, 0, 74, 0.18);
   transition: box-shadow 0.2s, transform 0.2s;
+  /* Tap highlight removal for mobile WebKit */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav-cta:hover {
@@ -119,7 +210,6 @@ body {
   position: absolute;
   top: -80px;
   left: 50%;
-  transform: translateX(-50%);
   width: min(90vw, 900px);
   height: min(50vh, 500px);
   background: radial-gradient(
@@ -129,6 +219,10 @@ body {
     transparent 70%
   );
   pointer-events: none;
+  /* Use transform for positioning (GPU composited, no layout trigger) */
+  -webkit-transform: translateX(-50%) translateZ(0);
+  transform: translateX(-50%) translateZ(0);
+  will-change: transform;
 }
 
 /* ─── MAIN LAYOUT ──────────────────────────────────────── */
@@ -136,13 +230,17 @@ body {
 main {
   position: relative;
   min-height: 100vh;
+  /* Use dvh where supported for in-app browser address bar handling */
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  /* Prevent the browser from panning/scrolling the hero on touch;
-     all gesture handling is done by the WebGL simulation JS. */
+  /* Prevent page dragging/rubber-banding on touch devices */
   touch-action: none;
+  -webkit-touch-callout: none;
+  /* Prevent horizontal overflow */
+  max-width: 100vw;
 }
 
 /* ─── ORB ──────────────────────────────────────────────── */
@@ -151,10 +249,13 @@ main {
   position: absolute;
   bottom: -200px;
   left: 50%;
-  transform: translateX(-50%);
   width: min(90vw, 860px);
   height: min(90vw, 860px);
   pointer-events: none;
+  /* GPU layer — use transform for positioning instead of left calc */
+  -webkit-transform: translateX(-50%) translateZ(0);
+  transform: translateX(-50%) translateZ(0);
+  will-change: transform;
 }
 
 .orb {
@@ -171,12 +272,16 @@ main {
       transparent              74%
     );
   border: 1px solid rgba(255, 255, 255, 0.06);
+  /* GPU-composited animation using only transform + opacity */
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   animation: orbPulse 8s ease-in-out infinite;
 }
 
 @keyframes orbPulse {
-  0%, 100% { opacity: 1;    transform: scale(1);    }
-  50%       { opacity: 0.80; transform: scale(1.05); }
+  0%, 100% { opacity: 1;    transform: scale(1)    translateZ(0); }
+  50%       { opacity: 0.80; transform: scale(1.05) translateZ(0); }
 }
 
 /* ─── CONTENT ──────────────────────────────────────────── */
@@ -192,12 +297,16 @@ main {
   width: 90%;
   max-width: 940px;
   padding: 2rem;
+  /* GPU layer for smooth entry animation */
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0);    }
 }
 
 /* Badge pill */
@@ -213,6 +322,7 @@ main {
   border: 1px solid var(--border);
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   animation: fadeUp 0.9s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -232,6 +342,8 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Needed for older Chromium-based in-app browsers */
+  color: transparent;
 }
 
 /* Tagline */
@@ -261,12 +373,19 @@ h1 {
   border: 1px solid var(--border);
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  /* Prefer transform/opacity transitions — no layout repaint */
   transition: border-color 0.25s ease,
               background   0.25s ease,
               transform    0.25s ease,
               color        0.25s ease;
   animation: fadeUp 0.9s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Ensure touch targets work on all mobile browsers */
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  /* Minimum touch target size for accessibility */
+  min-height: 44px;
 }
 
 .linkedin-btn svg {
@@ -281,8 +400,50 @@ h1 {
   transform: translateY(-2px);
 }
 
+/* Also handle active/focus for touch devices */
+.linkedin-btn:active {
+  transform: translateY(0);
+}
+
+.linkedin-btn:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+}
+
 .linkedin-btn:hover svg {
   transform: scale(1.15);
+}
+
+/* ─── PREFERS-REDUCED-MOTION ───────────────────────────── */
+/* Respect OS-level accessibility setting & low power mode on iOS */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .orb {
+    animation: none;
+    opacity: 0.85;
+  }
+
+  .css-fallback::before,
+  .css-fallback::after {
+    animation: none;
+  }
+
+  /* Still show static content (fadeUp lands at final state via 'both' fill) */
+  .content, .badge, h1, .tagline, .linkedin-btn {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Pause the fluid canvas via a data attribute set by JS */
+  #hero-fluid-canvas {
+    opacity: 0.5;
+  }
 }
 
 /* ─── RESPONSIVE ───────────────────────────────────────── */
@@ -313,9 +474,12 @@ h1 {
   .nav-cta { padding: 0.6rem 1.25rem; font-size: 0.95rem; }
 }
 
-/* Make canvas fill the visible viewport on mobile reliably */
-#hero-fluid-canvas {
-  width: 100%;
-  height: 100vh;
-  min-height: 100svh;
+/* ─── SAFE-AREA (notched devices) ──────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  main {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  #navbar {
+    margin-top: max(8px, env(safe-area-inset-top));
+  }
 }
