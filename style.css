@@ -458,9 +458,9 @@ h1 {
   }
 
   .orb-wrap {
-    width: min(80vw, 500px);
-    height: min(80vw, 500px);
-    bottom: -90px;
+    width: min(88vw, 400px);
+    height: min(88vw, 400px);
+    bottom: -200px;
   }
 
   h1 {
