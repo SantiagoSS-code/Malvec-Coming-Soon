@@ -43,17 +43,32 @@
     var gl  = glResult.gl;
     var ext = glResult.ext;
 
-    /* ─── Resize canvas to match CSS size ────────────────────────── */
+    /* ─── Resize canvas to match CSS size (DPR-aware for sharpness) ── */
+    // Canvas buffer = CSS pixels × DPR  → sharp on Retina / iPhone
+    // cssW / cssH   = CSS pixels         → used for coordinate math so
+    //                                       pointer intensity is unchanged
+    var cssW = 1;
+    var cssH = 1;
+    var deviceDPR = Math.min(window.devicePixelRatio || 1, 2); // cap at 2× for perf
+
     function resizeCanvas() {
-        if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
-            canvas.width  = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
+        var cw = canvas.clientWidth  || window.innerWidth;
+        var ch = canvas.clientHeight || window.innerHeight;
+        var bw = Math.round(cw * deviceDPR);
+        var bh = Math.round(ch * deviceDPR);
+        if (canvas.width !== bw || canvas.height !== bh) {
+            canvas.width  = bw;
+            canvas.height = bh;
+            cssW = cw;
+            cssH = ch;
             return true; // resized
         }
         return false;
     }
-    canvas.width  = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    cssW = canvas.clientWidth  || window.innerWidth;
+    cssH = canvas.clientHeight || window.innerHeight;
+    canvas.width  = Math.round(cssW * deviceDPR);
+    canvas.height = Math.round(cssH * deviceDPR);
 
     /* ─── Config (tuned per device class) ──────────────────────── */
     var TEXTURE_DOWNSAMPLE   = (isMobile || isInApp) ? 2 : 1;
@@ -709,8 +724,8 @@
     function splat(x, y, dx, dy, color) {
         splatProgram.bind();
         gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read[2]);
-        gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
-        gl.uniform2f(splatProgram.uniforms.point, x / canvas.width, 1.0 - y / canvas.height);
+        gl.uniform1f(splatProgram.uniforms.aspectRatio, cssW / cssH);
+        gl.uniform2f(splatProgram.uniforms.point, x / cssW, 1.0 - y / cssH);
         gl.uniform3f(splatProgram.uniforms.color, dx, -dy, 1.0);
         gl.uniform1f(splatProgram.uniforms.radius, SPLAT_RADIUS);
         blit(velocity.write[1]);
@@ -725,8 +740,8 @@
     function multipleSplats(amount) {
         for (var i = 0; i < amount; i++) {
             var color = malvecColor();
-            var x = canvas.width * Math.random();
-            var y = canvas.height * Math.random();
+            var x = cssW * Math.random();
+            var y = cssH * Math.random();
             var dx = 700 * (Math.random() - 0.5);
             var dy = 700 * (Math.random() - 0.5);
             splat(x, y, dx, dy, color);
