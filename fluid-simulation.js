@@ -49,7 +49,7 @@
     //                                       pointer intensity is unchanged
     var cssW = 1;
     var cssH = 1;
-    var deviceDPR = Math.min(window.devicePixelRatio || 1, 2); // cap at 2× for perf
+    var deviceDPR = window.devicePixelRatio || 1;
 
     function resizeCanvas() {
         var cw = canvas.clientWidth  || window.innerWidth;
@@ -71,7 +71,7 @@
     canvas.height = Math.round(cssH * deviceDPR);
 
     /* ─── Config (tuned per device class) ──────────────────────── */
-    var TEXTURE_DOWNSAMPLE   = (isMobile || isInApp) ? 2 : 1;
+    var TEXTURE_DOWNSAMPLE   = 1;
     var DENSITY_DISSIPATION  = 0.98;
     var VELOCITY_DISSIPATION = 0.99;
     var PRESSURE_DISSIPATION = 0.8;
