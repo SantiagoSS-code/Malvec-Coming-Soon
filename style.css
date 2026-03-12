@@ -30,13 +30,14 @@
 
 html, body {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
-  overflow: auto;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -139,6 +140,9 @@ main {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  /* Prevent the browser from panning/scrolling the hero on touch;
+     all gesture handling is done by the WebGL simulation JS. */
+  touch-action: none;
 }
 
 /* ─── ORB ──────────────────────────────────────────────── */
